@@ -10,6 +10,7 @@ void casualitygenerator(int game[]){
 	srand(time(NULL));
 	for(i=0;i<MAX;i++){
 		game[i]=rand() % 7;
+		printf("%d DEBUG\n", game[i]);
 	}
 	return;
 }
@@ -25,7 +26,29 @@ void gamestart(){ //manuale, regole del gioco
 }
 
 void gameplayer(int game[], int gamecompare[]){ //qui avviene il gioco
-	
+	int trials=10;
+	int i,j,o; //servizio
+	int perfection=0,presence=0;
+	do{
+		printf("\nInserisci i dati: "); //da rimpiazzare
+		for(o=0;o<MAX;o++) scanf("%d",&gamecompare[o]); //ottimizzato
+		for(i=0;i<MAX;i++){
+			for(j=0;j<MAX;j++){
+				if(game[i]==gamecompare[j]){
+					presence++;
+					if(i==j){
+						perfection++;
+					}else if(perfection>0){
+						perfection--;
+					}
+				}else if(presence>0){
+					presence--;
+				}
+			}
+		}
+		printf("\n#%d\t%d %d %d %d\tP:%d C:%d",trials,gamecompare[0],gamecompare[1],gamecompare[2],gamecompare[3],presence,perfection);
+		trials--;
+	}while(trials!=0);
 }
 int main(){
 	int game[MAX];
