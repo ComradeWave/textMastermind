@@ -65,7 +65,7 @@ void casualitygenerator(int game[]){ //Crea numeri casuali
 }
 
 void gamestart(){ //manuale, regole del gioco
-	printf("\nHai 10 tentativi per indovinare 4 numeri!\n");
+	printf("\nHai 10 tentativi per indovinare la sequenza corretta!\n");
 	printf("\nEsempio: #1\t1, 2, 3, 4");
 //	printf("\nP, C: Presente e Corretto\n");
 	printf("\nBuona Fortuna!\n");	
