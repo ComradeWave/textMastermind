@@ -1,3 +1,4 @@
+#include <cstring>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -6,7 +7,7 @@
 #define DIM_SEQ 4
 #define NUM_MAX 6
 #define NUM_TENTATIVI 10
-#define CHEAT 0 //usare solo per debugging
+#define CHEAT 1
 
 
 void gameins(int seq_generata[]){
