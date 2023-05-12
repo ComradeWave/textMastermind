@@ -3,98 +3,96 @@
 #include <time.h>
 #include <unistd.h>
 #include <stdbool.h>
-#define MAX 4
+#define DIM_SEQ 4
+#define NUM_MAX 6
+#define NUM_TENTATIVI 10
+#define CHEAT 0 //usare solo per debugging
 
 
-bool gamecontrol(int *perfection, int *presence, int game[], int gamecompare[], int trials){
-	int x, y; //servizio
-	for(x=0;x<MAX;x++){
-		for(y=0;y<MAX;y++){
-			if(gamecompare[y]==game[x]){ //controllo VALORE degli array per determinare la presenza
-				*presence=*presence+1;
-				//printf("%d DBEUGGY\n", *presence);
-				if(x==y){
-					*perfection=*presence+1; //posizione e valore uguale
-				//	printf("%d DBEUGGYA\n", *perfection);				
-				}
-			}
-		}
-	}
-	if(*perfection==MAX){
-		return 1;
-	}else{
-		printf("#%d\t\t%d\t%d\t%d\t%d \t Numeri Presenti: %d Numeri corretti: %d\n", trials, gamecompare[0], gamecompare[1], gamecompare[2], gamecompare[3], presence, perfection);
-		return 0;
-	}
+void gameins(int seq_generata[]){
+  int pos_esatta, //numeri in posizione esatta
+    presenti, //numeri presenti nella sequenza in qualsiasi posizione
+    i,
+    input[DIM_SEQ], //input utente
+    tentativi = 0, //numero tentativo corrente
+    conta_numeri[NUM_MAX], // ↓ ma che viene modificato durante l'iterazione
+    conta_numeri2[NUM_MAX]; //conta del numero di occorrenze dei numeri possibili
+    _Bool vinto = false, ignora;
+
+    for (i = 0; i < NUM_MAX; i++)
+        conta_numeri2[i] = 0; // inizializza array conta numeri
+
+    for (i = 0; i < DIM_SEQ; i++)
+        conta_numeri2[seq_generata[i] - 1]++; // conta numeri
+
+    do {
+        memcpy(conta_numeri, conta_numeri2, sizeof(int) * NUM_MAX); // copia conta numeri persistente nell'array che viene modificato
+        pos_esatta = 0; // azzera variabili
+        presenti = 0;
+        ignora = false;
+
+        printf("Tentativo %d\n"
+               "Inserisci la sequenza: ", tentativi  + 1);
+        for (i = 0; i < DIM_SEQ; i++)
+            scanf("%d", &input[i]); // leggi input
+
+        for (i = 0; i < DIM_SEQ; i++) { // Itera sull'input utente
+            if (input[i] < 1 || input[i] > NUM_MAX) {
+                printf("Numero non valido! Sequenza ignorata\n");
+                ignora = true;
+                break;
+            }
+            if (seq_generata[i] == input[i])  // Compara val i-esimo input utente con val i-esimo della sequenza generata, se sono uguali allora è in posizione esatta
+                pos_esatta++;
+            if (conta_numeri[input[i] - 1] > 0) { // Controlla se il valore i-esimo inserito dall'utente ha una conta non nulla
+                presenti++; // Conta numero presente
+                conta_numeri[input[i] - 1]--; // Decrementa conta del valore presente
+            }
+        }
+        if (!ignora) {
+            printf("%d numeri presenti di cui %d in posizione esatta\n", presenti, pos_esatta);
+            tentativi++;
+        }
+
+        if (pos_esatta == DIM_SEQ) {
+            printf("Hai vinto!\n");
+            vinto = true;
+        }
+    } while (!vinto && tentativi < NUM_TENTATIVI);
+    if (!vinto)
+        printf("Tentativi esauriti!\n");
+
 }
 
-
-
-bool gameins(int game[], int gamecompare[], int trials){
-	int index; //servizio
-	int perfection=0,presence=0;
-	bool error=false;
-	do{
-		printf("\nInserisci i numeri: "); 
-		scanf("%d %d %d %d", &gamecompare[0], &gamecompare[1], &gamecompare[2], &gamecompare[3]);
-		for(index=0;index<MAX;index++){
-			if(gamecompare[index]<1 || gamecompare[index]>6){
-				printf("INPUT ERRATO\n");
-				error=true;
-			}else{
-				error=false;
-			}
-		}
-	}while(error==true);
-	if(gamecontrol(&perfection, &presence, game, gamecompare, trials)==true){
-		return 1;
-	}else{
-		return 0;
-	}
-	
+void genera_seq(int game[]){ //Crea numeri casuali
+  int i;
+  for(i = 0; i < DIM_SEQ; i++){
+    game[i] = (rand() % NUM_MAX) + 1;
+  }
 }
 
-void casualitygenerator(int game[]){ //Crea numeri casuali
-	int i;
-	srand(time(NULL));
-	for(i=0;i<MAX;i++){
-		game[i]=rand() % 6+1;
-		printf("%d DEBUG\n", game[i]);
-	}
-	return;
+void gioco(){ //manuale, regole del gioco
+  printf("Hai %d tentativi per indovinare la sequenza corretta!\n", NUM_TENTATIVI);
+  printf("Esempio: 1, 2, 3, 4\n");
+//  printf("\nP, C: Presente e Corretto\n");
+  printf("Buona Fortuna!\n");
+  sleep(3);
+  printf("\e[1;1H\e[2J"); //REGEX
 }
 
-void gamestart(){ //manuale, regole del gioco
-	printf("\nHai 10 tentativi per indovinare la sequenza corretta!\n");
-	printf("\nEsempio: #1\t1, 2, 3, 4");
-//	printf("\nP, C: Presente e Corretto\n");
-	printf("\nBuona Fortuna!\n");	
-	sleep(3);
-	printf("\e[1;1H\e[2J"); //REGEX
-	return;
-}
-
-void gameplayer(int game[], int gamecompare[]){ //qui starta il gioco
-	int trials=10;
-	
-	
-	do{
-		
-			
-		if(gameins(game, gamecompare, trials)==true){
-			printf("HAI VINTOOO!\n");
-			return;
-		}
-		
-		trials--;
-	}while(trials!=0);
-}
 int main(){
-	int game[MAX]; //array dove ci sono i numeri casuali
-	int gamecompare[MAX]; //dove il player mette i numeri
-	casualitygenerator(game);
-	gamestart();
-	gameplayer(game, gamecompare);
-	
-	return 0;
+    srand(time(NULL));
+  int seq_generata[DIM_SEQ]; //array dove ci sono i numeri casuali
+    genera_seq(seq_generata);
+    if (CHEAT) {
+        for (int i = 0; i < DIM_SEQ; i++) { //debug
+            setbuf(stdout, 0);
+            printf("%d ", seq_generata[i]);
+        }
+        printf("\n---\n");
+    }
+    gioco();
+  gameins(seq_generata);
+
+  return 0;
 }
