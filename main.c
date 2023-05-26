@@ -1,4 +1,4 @@
-#include <cstring>
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -7,7 +7,7 @@
 #define DIM_SEQ 4
 #define NUM_MAX 6
 #define NUM_TENTATIVI 10
-#define CHEAT 1
+#define CHEAT 0 //DISATTIVATO PER DEFAULT
 
 
 void gameins(int seq_generata[]){
@@ -58,6 +58,7 @@ void gameins(int seq_generata[]){
         if (pos_esatta == DIM_SEQ) {
             printf("Hai vinto!\n");
             vinto = true;
+            sleep(5);
         }
     } while (!vinto && tentativi < NUM_TENTATIVI);
     if (!vinto)
